@@ -16,8 +16,7 @@ done
 
 # Lanjutkan script kamu di bawah ini
 echo "🚀 Menjalankan bagian selanjutnya dari script..."
-
-echo "🚀 Mulai generate SSL via Let's Encrypt (Manual DNS)"
+sleep 1
 
 red='\033[0;31m'
 reset='\033[0m'
@@ -32,34 +31,41 @@ cat <<'EOF'
  |_____/|_|  |_|  |_|  |_____/     |_|\___|\__,_|_| |_| |_|
 EOF
 printf "${reset}\n"
-
+sleep 1
+echo "🚀 Mulai generate SSL via Let's Encrypt (Manual DNS)"
+sleep 1
 read -p "Masukkan domain aktif kamu (wajib pointing ke DNS publik): " domain
 
 echo "📦 Install certbot..."
 sudo apt update -y
 sudo apt install certbot -y
 
+mkdir -p ssl-output/config ssl-output/work ssl-output/logs
+
 echo "🌐 Jalankan certbot manual DNS challenge..."
+
 certbot certonly \
   --manual \
   --preferred-challenges dns \
   --register-unsafely-without-email \
   --agree-tos \
+  --config-dir ./ssl-output/config \
+  --work-dir ./ssl-output/work \
+  --logs-dir ./ssl-output/logs \
   -d "$domain"
 
-# Cek apakah berhasil
-LIVE_DIR="/etc/letsencrypt/live/$domain"
+LIVE_DIR="./ssl-output/config/live/$domain"
 if [ ! -d "$LIVE_DIR" ]; then
   echo "❌ Gagal ambil sertifikat dari Let's Encrypt!"
   exit 1
 fi
 
 echo "✅ SSL berhasil dibuat!"
-
-# Salin file ke direktori kerja
+sleep 1
 cp "$LIVE_DIR/fullchain.pem" "./cert.pem"
 cp "$LIVE_DIR/privkey.pem" "./key.pem"
-
+sleep 1
 echo "📁 File berhasil disalin:"
 echo " - cert.pem (sertifikat)"
 echo " - key.pem (private key)"
+echo "SSL Generator | Made by SMTD Team"
